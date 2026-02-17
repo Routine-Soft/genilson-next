@@ -9,14 +9,17 @@ interface Params {
 }
 
 // PATCH - Atualizar
-export async function PATCH(request: Request, { params }: Params) {
+export async function PATCH(request: Request, 
+  context: { params: Promise<{id: string}> }
+) {
   try {
     await connectDB();
 
+    const { id } = await context.params;
     const updates = await request.json();
 
     const cursoAtualizado = await Curso.findByIdAndUpdate(
-      params.id,
+      id,
       updates,
       { new: true }
     );
@@ -43,12 +46,13 @@ export async function PATCH(request: Request, { params }: Params) {
 // DELETE - Deletar
 export async function DELETE(
   request: Request,
-  { params }: Params
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
     await connectDB();
 
-    const cursoDeletado = await Curso.findByIdAndDelete(params.id);
+    const { id } = await context.params;
+    const cursoDeletado = await Curso.findByIdAndDelete(id);
 
     if (!cursoDeletado) {
       return NextResponse.json(

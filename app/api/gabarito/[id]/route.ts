@@ -3,12 +3,6 @@ import jwt from "jsonwebtoken";
 import connectDB from "@/database/db";
 import GabaritoModel from "@/models/gabaritoModel";
 
-type RouteParams = {
-  params: {
-    id: string;
-  };
-};
-
 type JwtPayload = {
   email: string;
   userId: string;
@@ -31,7 +25,7 @@ function verifyToken(request: NextRequest): boolean {
 /* PATCH */
 export async function PATCH(
   request: NextRequest,
-  { params }: RouteParams
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
     await connectDB();
@@ -43,10 +37,11 @@ export async function PATCH(
       );
     }
 
+    const { id } = await context.params;
     const updates = await request.json();
 
     const atualizado = await GabaritoModel.findByIdAndUpdate(
-      params.id,
+      id,
       updates,
       { new: true }
     );
@@ -71,7 +66,7 @@ export async function PATCH(
 /* DELETE */
 export async function DELETE(
   request: NextRequest,
-  { params }: RouteParams
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
     await connectDB();
@@ -83,7 +78,9 @@ export async function DELETE(
       );
     }
 
-    const deletado = await GabaritoModel.findByIdAndDelete(params.id);
+    const { id } = await context.params;
+
+    const deletado = await GabaritoModel.findByIdAndDelete(id);
 
     if (!deletado) {
       return NextResponse.json(

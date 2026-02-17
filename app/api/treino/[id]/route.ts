@@ -1,15 +1,7 @@
-// app/api/treino/[id]/route.ts
-
 import { NextRequest, NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
 import Treino from "@/models/treinoModel";
 import connectDB from "@/database/db";
-
-type RouteParams = {
-  params: {
-    id: string;
-  };
-};
 
 type JwtPayload = {
   email: string;
@@ -40,7 +32,7 @@ async function verifyToken(request: NextRequest): Promise<boolean> {
 /* ===================== PATCH ===================== */
 export async function PATCH(
   request: NextRequest,
-  { params }: RouteParams
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
     await connectDB();
@@ -54,7 +46,7 @@ export async function PATCH(
       );
     }
 
-    const { id } = params;
+    const { id } = await context.params;
     const updates = await request.json();
 
     const treinoAtualizado = await Treino.findByIdAndUpdate(
@@ -72,7 +64,7 @@ export async function PATCH(
 
     return NextResponse.json(treinoAtualizado, { status: 200 });
 
-  } catch (error: unknown) {
+  } catch {
     return NextResponse.json(
       { mensagem: "Erro interno do servidor" },
       { status: 500 }
@@ -83,7 +75,7 @@ export async function PATCH(
 /* ===================== DELETE ===================== */
 export async function DELETE(
   request: NextRequest,
-  { params }: RouteParams
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
     await connectDB();
@@ -97,7 +89,7 @@ export async function DELETE(
       );
     }
 
-    const { id } = params;
+    const { id } = await context.params;
 
     const treinoDeletado = await Treino.findByIdAndDelete(id);
 
@@ -113,7 +105,7 @@ export async function DELETE(
       { status: 200 }
     );
 
-  } catch (error: unknown) {
+  } catch {
     return NextResponse.json(
       { message: "Erro interno do servidor" },
       { status: 500 }

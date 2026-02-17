@@ -1,23 +1,17 @@
 // app/api/user/[email]/route.ts
 
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import User from "@/models/UserModel";
-import db from "@/database/db"
-
-type RouteParams = {
-  params: {
-    email: string;
-  };
-};
+import db from "@/database/db";
 
 export async function GET(
-  _request: Request,
-  { params }: RouteParams
+  _request: NextRequest,
+  context: { params: Promise<{ email: string }> }
 ) {
   try {
     await db();
 
-    const email = params.email;
+    const { email } = await context.params;
 
     if (!email) {
       return NextResponse.json(
@@ -42,7 +36,8 @@ export async function GET(
       },
       { status: 200 }
     );
-  } catch (error) {
+
+  } catch {
     return NextResponse.json(
       { message: "Erro no servidor ao fazer login" },
       { status: 500 }

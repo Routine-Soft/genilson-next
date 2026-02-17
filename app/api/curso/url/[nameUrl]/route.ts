@@ -8,11 +8,13 @@ interface Params {
   };
 }
 
-export async function GET(request: Request, { params }: Params) {
+export async function GET(request: Request, 
+  context: { params: Promise<{nameUrl: string}> }) {
   try {
     await connectDB();
 
-    const curso = await Curso.findOne({ nameUrl: params.nameUrl });
+    const { nameUrl } = await context.params;
+    const curso = await Curso.findOne({ nameUrl});
 
     if (!curso) {
       return NextResponse.json(

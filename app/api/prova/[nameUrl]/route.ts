@@ -1,23 +1,15 @@
-// app/api/prova/[nameUrl]/route.ts
-
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import Treino from "@/models/treinoModel";
 import connectDB from "@/database/db";
 
-type RouteParams = {
-  params: {
-    nameUrl: string;
-  };
-};
-
 export async function GET(
-  _request: Request,
-  { params }: RouteParams
+  _request: NextRequest,
+  context: { params: Promise<{ nameUrl: string }> }
 ) {
   try {
     await connectDB();
 
-    const { nameUrl } = params;
+    const { nameUrl } = await context.params;
 
     const url = await Treino.findOne({ nameUrl });
 
@@ -30,7 +22,7 @@ export async function GET(
 
     return NextResponse.json(url, { status: 200 });
 
-  } catch (error: unknown) {
+  } catch {
     return NextResponse.json(
       { message: "Erro ao buscar nameUrl" },
       { status: 500 }
