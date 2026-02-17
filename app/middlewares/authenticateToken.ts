@@ -1,28 +1,16 @@
-import jwt, { JwtPayload } from "jsonwebtoken";
+import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
 
-const secretKey = "123";
+export function middleware(request: NextRequest) {
+  const response = NextResponse.next();
 
-export interface AuthenticatedUser extends JwtPayload {
-  id: string;
-  email: string;
+  response.headers.set("Access-Control-Allow-Origin", "*");
+  response.headers.set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+  response.headers.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
+
+  return response;
 }
 
-export function authenticateToken(request: Request): AuthenticatedUser {
-  const authHeader = request.headers.get("authorization");
-
-  if (!authHeader) {
-    throw new Error("Token não fornecido");
-  }
-
-  try {
-    const decoded = jwt.verify(authHeader, secretKey);
-
-    if (typeof decoded === "string") {
-      throw new Error("Token inválido");
-    }
-
-    return decoded as AuthenticatedUser;
-  } catch (error) {
-    throw new Error("Token inválido");
-  }
-}
+export const config = {
+  matcher: "/api/:path*",
+};
