@@ -5,7 +5,7 @@ import HistoricoProva from "@/models/historicoProva";
 type CreateHistoricoProvaBody = {
   tituloProva: string;
   name: string;
-  email: string;
+  email?: string;
   whatsapp: string;
   cpf: string;
 };
@@ -18,9 +18,10 @@ export async function POST(request: Request) {
     const body: CreateHistoricoProvaBody = await request.json();
     const { tituloProva, name, email, whatsapp, cpf } = body;
 
-    if (!tituloProva || !name || !email || !whatsapp || !cpf) {
+    // E-mail é opcional
+    if (!tituloProva || !name || !whatsapp || !cpf) {
       return NextResponse.json(
-        { message: "Todos os campos são obrigatórios" },
+        { message: "Preencha nome, CPF e WhatsApp" },
         { status: 400 }
       );
     }
@@ -28,7 +29,7 @@ export async function POST(request: Request) {
     const novoHistoricoProva = new HistoricoProva({
       tituloProva,
       name,
-      email,
+      email: email ? email.trim().toLowerCase() : "",
       whatsapp,
       cpf,
     });

@@ -5,7 +5,7 @@ import HistoricoCurso from "@/models/historicoCurso";
 type CreateHistoricoCursoBody = {
   tituloCurso: string;
   name: string;
-  email: string;
+  email?: string;
   whatsapp: string;
   cpf: string;
 };
@@ -17,9 +17,10 @@ export async function POST(request: Request) {
     const body: CreateHistoricoCursoBody = await request.json();
     const { tituloCurso, name, email, whatsapp, cpf } = body;
 
-    if (!tituloCurso || !name || !email || !whatsapp || !cpf) {
+    // E-mail é opcional
+    if (!tituloCurso || !name || !whatsapp || !cpf) {
       return NextResponse.json(
-        { message: "Todos os campos são obrigatórios" },
+        { message: "Preencha nome, CPF e WhatsApp" },
         { status: 400 }
       );
     }
@@ -27,7 +28,7 @@ export async function POST(request: Request) {
     const novoHistoricoCurso = new HistoricoCurso({
       tituloCurso,
       name,
-      email,
+      email: email ? email.trim().toLowerCase() : "",
       whatsapp,
       cpf,
     });
